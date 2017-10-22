@@ -1,0 +1,2 @@
+./.github/ISSUE_TEMPLATE.md ./.github/PULL_REQUEST_TEMPLATE.md ./.gitignore ./.travis.yml ./CONTRIBUTING.md ./LICENSE.md ./Makefile ./MANIFEST.in ./oki/__init__.py ./oki/main.py ./oki/VERSION ./pylama.ini 
+./pytest.ini ./README.md ./setup.cfg ./setup.py ./tests/__init__.py ./tests/test_main.py ./tox.ini
