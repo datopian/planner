@@ -79,3 +79,7 @@ target/
 
 # Extras
 .projectile
+
+
+.idea/
+planner.iml

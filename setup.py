@@ -21,6 +21,7 @@ def read(*paths):
 PACKAGE = 'planner'
 NAME = PACKAGE.replace('_', '-')
 INSTALL_REQUIRES = [
+    'PyYaml', 'datapackage', 'datapackage_pipelines'
 ]
 TESTS_REQUIRE = [
     'pylama',

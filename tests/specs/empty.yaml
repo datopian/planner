@@ -1,0 +1,40 @@
+meta:
+  owner: testowner
+  ownerid: testownerid
+  dataset: testdataset
+  version: 1
+  findability: published
+inputs:
+ -
+    kind: datapackage
+    url: http://example.com/datapackage.json
+    parameters:
+      descriptor:
+        name: dataset
+#      resource-mapping:
+#        <resource-name-or-path>: <resource-url>
+
+#processing:
+# -
+#   input: <source-resource-name - e.g. `my-excel-resource`>
+#   output: <destination-resource-name - e.g. `my-excel-resource-sheet-1`>
+#   tabulator:
+#     headers: 2
+#     sheet: 1
+#
+#outputs:
+#  -
+#    kind: rdbms  # dump.to_sql
+#    parameters:
+#      engine: <tbd, should be the name of a user provided configuration - not the actual connection string>
+#  -
+#    kind: sqlite # dump.to_sql
+#  -
+#    kind: npm
+#    parameters:
+#      credentials: <tbd, should be the name of a user provided configuration - not the actual credentials>
+#  -
+#    kind: zip (dump.to_zip)
+#    parameters:
+#        out-file: <name of the file>
+#  - ... # other output formats
