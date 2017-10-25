@@ -22,19 +22,18 @@ class DerivedPreviewProcessingNode(BaseProcessingNode):
                               'format': self.fmt,
                               'path': 'data/{}.{}'.format(resource_name, self.fmt),
                               'datahub': {
-                                'type': "derived/preview",
-                                'derivedFrom': [
-                                    artifact.resource_name.replace('_csv', '')
-                                ]
+                                  'type': "derived/preview",
+                                  'derivedFrom': [
+                                      artifact.resource_name.replace('_csv', '')
+                                  ]
                               },
                               "forView": [
-                                'datahub-preview-{}'.format(resource_name)
+                                  'datahub-preview-{}'.format(resource_name)
                               ]
                           }
                       }),
-                     # TODO pass limit as a parameter
-                     ('assembler.load_preview', {}),
-                     ('assembler.load_views', {})],
+                     ('assembler.load_preview', {'limit': 2000}),
+                     ('assembler.load_views', {'limit': 2000})],
                     True
                 )
                 yield output

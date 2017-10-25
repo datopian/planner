@@ -30,10 +30,21 @@ def _plan(revision, spec, **config):
     urls = []
     inner_pipeline_ids = []
 
+    outputs = spec.get('outputs', [])
+    zip_there = any(output['kind'] == 'zip' for output in outputs)
+    if not zip_there:
+        zip_output = {
+            'kind': 'zip',
+            'parameters': {
+                'out-file': '%s.zip' % meta.get('dataset', 'datahub')
+            }
+        }
+        outputs.append(zip_output)
+
     def planner_pipelines():
         planner_gen = planner(input,
                               spec.get('processing', []),
-                              spec.get('outputs', []),
+                              outputs,
                               **config)
         datapackage_url = None
         while True:
@@ -49,7 +60,8 @@ def _plan(revision, spec, **config):
 
             pipeline = {
                 'pipeline': steps(*pipeline_steps),
-                'dependencies': dependencies
+                'dependencies': dependencies,
+                'schedule': schedule
             }
             yield inner_pipeline_id, pipeline
 
@@ -81,6 +93,9 @@ def _plan(revision, spec, **config):
         ('assembler.sample',),
     ]
     final_steps.extend(dump_steps(pipeline_id(), 'latest'))
+    final_steps.append(('assembler.add_indexing_resource', {
+        'flow-id': pipeline_id()
+    }))
     final_steps.append(
         ('elasticsearch.dump.to_index',
          {
@@ -90,6 +105,12 @@ def _plan(revision, spec, **config):
                          'resource-name': '__datasets',
                          'doc-type': 'dataset'
                      }
+                 ],
+                 'events': [
+                    {
+                        'resource-name': '__events',
+                        'doc-type': 'event'
+                     }
                  ]
              }
          })
@@ -97,8 +118,7 @@ def _plan(revision, spec, **config):
     pipeline = {
         'update_time': update_time,
         'dependencies': dependencies,
-        'pipeline': steps(*final_steps),
-        'schedule': schedule
+        'pipeline': steps(*final_steps)
     }
     # print('yielding', pipeline_id(), pipeline)
     yield pipeline_id(), pipeline
