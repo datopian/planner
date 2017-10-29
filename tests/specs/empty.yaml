@@ -1,7 +1,7 @@
 meta:
   owner: testowner
   ownerid: testownerid
-  dataset: testdataset
+  dataset: empty
   version: 1
   findability: published
 inputs:

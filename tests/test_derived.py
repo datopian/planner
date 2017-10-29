@@ -30,5 +30,6 @@ def test_partial(spec, config):
                 params = step['parameters']
                 formats.append((params['path'], res_name, fmt))
 
-    expected_num = len(config['allowed_types'])
+    expected_num = len(config['allowed_types']) if spec['meta']['dataset'] == \
+        'empty' else len(config['allowed_types']) + 1
     assert expected_num == len(formats)
