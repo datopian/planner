@@ -98,7 +98,7 @@ def _plan(revision, spec, **config):
          }),
         ('assembler.sample',),
     ]
-    final_steps.extend(dump_steps(ownerid, dataset, 'latest'))
+    final_steps.extend(dump_steps(ownerid, dataset, 'latest', final=True))
     final_steps.append(('assembler.add_indexing_resource', {
         'flow-id': pipeline_id()
     }))

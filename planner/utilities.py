@@ -1,12 +1,14 @@
 import os
 
 
-def dump_steps(*parts):
+def dump_steps(*parts, final=False):
+    dumper = 'assembler.dump_to_s3' if final else 'aws.dump.to_s3'
+    handle_non_tabular = False if final else True
     if os.environ.get('PLANNER_LOCAL'):
         return [('dump.to_path',
                  {
                      'force-format': False,
-                     'handle-non-tabular': True,
+                     'handle-non-tabular': handle_non_tabular,
                      'add-filehash-to-path': True,
                      'out-path': '/'.join(str(p) for p in parts),
                      'counters': {
@@ -19,10 +21,10 @@ def dump_steps(*parts):
                      }
                  })]
     else:
-        return [('assembler.dump_to_s3',
+        return [(dumper,
                  {
                      'force-format': False,
-                     'handle-non-tabular': True,
+                     'handle-non-tabular': handle_non_tabular,
                      'add-filehash-to-path': True,
                      'bucket': os.environ['PKGSTORE_BUCKET'],
                      'path': '/'.join(str(p) for p in parts),

@@ -26,7 +26,7 @@ def test_partial(spec, config):
                 assert params['datahub']['type'] == 'derived/' + fmt
                 assert len(params['datahub']['derivedFrom']) == 1
                 res_name = params['name']
-            elif step['run'] == 'assembler.dump_to_s3':
+            elif step['run'].endswith('to_s3'):
                 params = step['parameters']
                 formats.append((params['path'], res_name, fmt))
 
