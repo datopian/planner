@@ -1,8 +1,12 @@
 # -*- coding: utf-8 -*-
+import os
+
 from datapackage_pipelines.generators import steps
 
 from .nodes.planner import planner
 from .utilities import s3_path, dump_steps
+
+FLOWMANAGER_HOOK_URL = os.environ.get('FLOWMANAGER_HOOK_URL')
 
 
 def _plan(revision, spec, **config):
@@ -11,11 +15,12 @@ def _plan(revision, spec, **config):
 
     def pipeline_id(r=None):
         if r is not None:
-            return '{ownerid}/{dataset}:{suffix}'.format(**meta, suffix=r)
+            return '{ownerid}/{dataset}/{revision}:{suffix}'.format(**meta, suffix=r, revision=revision)
         else:
-            return '{ownerid}/{dataset}'.format(**meta)
+            return '{ownerid}/{dataset}/{revision}'.format(**meta, revision=revision)
 
     ownerid = meta['ownerid']
+    dataset = meta['dataset']
     owner = meta.get('owner')
     findability = meta.get('findability', 'published')
     update_time = meta.get('update_time')
@@ -36,7 +41,7 @@ def _plan(revision, spec, **config):
         zip_output = {
             'kind': 'zip',
             'parameters': {
-                'out-file': '%s.zip' % meta.get('dataset', 'datahub')
+                'out-file': '/tmp/%s.%s.%s.zip' % (meta['ownerid'], meta['dataset'], revision)
             }
         }
         outputs.append(zip_output)
@@ -61,7 +66,8 @@ def _plan(revision, spec, **config):
             pipeline = {
                 'pipeline': steps(*pipeline_steps),
                 'dependencies': dependencies,
-                'schedule': schedule
+                'schedule': schedule,
+                'hooks': [FLOWMANAGER_HOOK_URL]
             }
             yield inner_pipeline_id, pipeline
 
@@ -92,7 +98,7 @@ def _plan(revision, spec, **config):
          }),
         ('assembler.sample',),
     ]
-    final_steps.extend(dump_steps(pipeline_id(), 'latest'))
+    final_steps.extend(dump_steps(ownerid, dataset, 'latest'))
     final_steps.append(('assembler.add_indexing_resource', {
         'flow-id': pipeline_id()
     }))
@@ -118,7 +124,8 @@ def _plan(revision, spec, **config):
     pipeline = {
         'update_time': update_time,
         'dependencies': dependencies,
-        'pipeline': steps(*final_steps)
+        'pipeline': steps(*final_steps),
+        'hooks': [FLOWMANAGER_HOOK_URL]
     }
     # print('yielding', pipeline_id(), pipeline)
     yield pipeline_id(), pipeline

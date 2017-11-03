@@ -7,6 +7,7 @@ def dump_steps(*parts):
                  {
                      'force-format': False,
                      'handle-non-tabular': True,
+                     'add-filehash-to-path': True,
                      'out-path': '/'.join(str(p) for p in parts),
                      'counters': {
                          "datapackage-rowcount": "datahub.stats.rowcount",
@@ -22,6 +23,7 @@ def dump_steps(*parts):
                  {
                      'force-format': False,
                      'handle-non-tabular': True,
+                     'add-filehash-to-path': True,
                      'bucket': os.environ['PKGSTORE_BUCKET'],
                      'path': '/'.join(str(p) for p in parts),
                      'counters': {
