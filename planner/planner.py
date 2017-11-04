@@ -15,7 +15,7 @@ def _plan(revision, spec, **config):
 
     def pipeline_id(r=None):
         if r is not None:
-            return '{ownerid}/{dataset}/{revision}:{suffix}'.format(**meta, suffix=r, revision=revision)
+            return '{ownerid}/{dataset}/{revision}/{suffix}'.format(**meta, suffix=r, revision=revision)
         else:
             return '{ownerid}/{dataset}/{revision}'.format(**meta, revision=revision)
 
