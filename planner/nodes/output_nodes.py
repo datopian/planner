@@ -12,7 +12,7 @@ class OutputToZipProcessingNode(BaseProcessingNode):
         if len(zip_params):
             out_file = zip_params[0]['parameters']['out-file']
             datahub_type = 'derived/{}'.format(self.fmt)
-            resource_name = out_file.replace('.', '_')
+            resource_name = 'datapackage_zip'
             output = ProcessingArtifact(
                 datahub_type, resource_name,
                 [], self.available_artifacts,
