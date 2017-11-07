@@ -25,7 +25,7 @@ class OutputToZipProcessingNode(BaseProcessingNode):
                     'url': out_file,
                     'name': resource_name,
                     'format': self.fmt,
-                    'path': 'data/{}'.format(out_file),
+                    'path': 'data/{}.zip'.format(resource_name),
                     'datahub': {
                       'type': "derived/zip",
                     },
