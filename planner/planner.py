@@ -19,6 +19,9 @@ def _plan(revision, spec, **config):
         else:
             return '{ownerid}/{dataset}/{revision}'.format(**meta, revision=revision)
 
+    def flow_id():
+        return '{ownerid}/{dataset}'.format(**meta)
+
     ownerid = meta['ownerid']
     dataset = meta['dataset']
     owner = meta.get('owner')
@@ -90,7 +93,7 @@ def _plan(revision, spec, **config):
                  'bytes': 0,
              },
              'modified': update_time,
-             'id': pipeline_id()
+             'id': flow_id()
          }),
         ('assembler.load_modified_resources',
          {
