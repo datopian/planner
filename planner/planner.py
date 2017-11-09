@@ -27,7 +27,6 @@ def _plan(revision, spec, **config):
     owner = meta.get('owner')
     findability = meta.get('findability', 'published')
     update_time = meta.get('update_time')
-    schedule = spec.get('schedule', {})
 
     inputs = spec.get('inputs', [])
     assert len(inputs) == 1, 'Only supporting one input atm'
@@ -69,7 +68,6 @@ def _plan(revision, spec, **config):
             pipeline = {
                 'pipeline': steps(*pipeline_steps),
                 'dependencies': dependencies,
-                'schedule': schedule,
                 'hooks': [FLOWMANAGER_HOOK_URL]
             }
             yield inner_pipeline_id, pipeline
