@@ -60,9 +60,12 @@ def _plan(revision, spec, **config):
             inner_pipeline_ids.append(inner_pipeline_id)
 
             datapackage_url = s3_path(inner_pipeline_id, 'datapackage.json')
+            datapackage_url = datapackage_url.replace('/{}/'.format(revision), '/')
             urls.append(datapackage_url)
 
-            pipeline_steps.extend(dump_steps(inner_pipeline_id))
+            path_without_revision = inner_pipeline_id.replace(
+                '/{}/'.format(revision), '/')
+            pipeline_steps.extend(dump_steps(path_without_revision))
             dependencies = [dict(pipeline=pipeline_id(r)) for r in dependencies]
 
             pipeline = {
