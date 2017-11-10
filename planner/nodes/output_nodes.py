@@ -16,7 +16,8 @@ class OutputToZipProcessingNode(BaseProcessingNode):
             output = ProcessingArtifact(
                 datahub_type, resource_name,
                 [], self.available_artifacts,
-                [('dump.to_zip', {
+                [('assembler.remove_hash', {}),
+                 ('dump.to_zip', {
                     'out-file': out_file,
                     'force-format': False,
                     'handle-non-tabular': True}),
