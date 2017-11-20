@@ -26,6 +26,7 @@ def _plan(revision, spec, **config):
     dataset = meta['dataset']
     owner = meta.get('owner')
     findability = meta.get('findability', 'published')
+    acl = 'private' if findability == 'private' else 'public-read'
     update_time = meta.get('update_time')
 
     inputs = spec.get('inputs', [])
@@ -103,6 +104,12 @@ def _plan(revision, spec, **config):
         ('assembler.sample',),
     ]
     final_steps.extend(dump_steps(ownerid, dataset, 'latest', final=True))
+    if not os.environ.get('PLANNER_LOCAL'):
+        final_steps.append(('aws.change_acl', {
+            'bucket': os.environ['PKGSTORE_BUCKET'],
+            'path': '{}/{}'.format(ownerid, dataset),
+            'acl': acl
+        }))
     final_steps.append(('assembler.add_indexing_resource', {
         'flow-id': pipeline_id()
     }))
