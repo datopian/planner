@@ -26,7 +26,9 @@ def _plan(revision, spec, **config):
     dataset = meta['dataset']
     owner = meta.get('owner')
     findability = meta.get('findability', 'published')
-    acl = 'private' if findability == 'private' else 'public-read'
+    acl = 'public-read'
+    if findability == 'private':
+        acl = 'private'
     update_time = meta.get('update_time')
 
     inputs = spec.get('inputs', [])
