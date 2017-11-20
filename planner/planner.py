@@ -106,12 +106,6 @@ def _plan(revision, spec, **config):
         ('assembler.sample',),
     ]
     final_steps.extend(dump_steps(ownerid, dataset, 'latest', final=True))
-    if not os.environ.get('PLANNER_LOCAL'):
-        final_steps.append(('aws.change_acl', {
-            'bucket': os.environ['PKGSTORE_BUCKET'],
-            'path': '{}/{}'.format(ownerid, dataset),
-            'acl': acl
-        }))
     final_steps.append(('assembler.add_indexing_resource', {
         'flow-id': pipeline_id()
     }))
@@ -134,6 +128,12 @@ def _plan(revision, spec, **config):
              }
          })
     )
+    if not os.environ.get('PLANNER_LOCAL'):
+        final_steps.append(('aws.change_acl', {
+            'bucket': os.environ['PKGSTORE_BUCKET'],
+            'path': '{}/{}'.format(ownerid, dataset),
+            'acl': acl
+        }))
     pipeline = {
         'update_time': update_time,
         'dependencies': dependencies,
