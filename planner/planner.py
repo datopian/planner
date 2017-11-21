@@ -51,6 +51,23 @@ def _plan(revision, spec, **config):
         }
         outputs.append(zip_output)
 
+    first_step = []
+    if not os.environ.get('PLANNER_LOCAL'):
+        first_step.append(('aws.change_acl', {
+            'bucket': os.environ['PKGSTORE_BUCKET'],
+            'path': '{}/{}'.format(ownerid, dataset),
+            'acl': 'private'
+        }))
+    pipeline_acl = {
+        'update_time': update_time,
+        'dependencies': [],
+        'pipeline': steps(*first_step),
+        'hooks': [FLOWMANAGER_HOOK_URL]
+    }
+    change_privacy_id = pipeline_id('change_privacy')
+
+    yield change_privacy_id, pipeline_acl
+
     def planner_pipelines():
         planner_gen = planner(input,
                               spec.get('processing', []),
@@ -70,6 +87,7 @@ def _plan(revision, spec, **config):
                 '/{}/'.format(revision), '/')
             pipeline_steps.extend(dump_steps(path_without_revision))
             dependencies = [dict(pipeline=pipeline_id(r)) for r in dependencies]
+            dependencies.append(dict(pipeline=change_privacy_id))
 
             pipeline = {
                 'pipeline': steps(*pipeline_steps),
@@ -81,6 +99,7 @@ def _plan(revision, spec, **config):
     yield from planner_pipelines()
 
     dependencies = [dict(pipeline=pid) for pid in inner_pipeline_ids]
+    dependencies.append(dict(pipeline=change_privacy_id))
     # print(dependencies)
     final_steps = [
         ('load_metadata',
@@ -106,12 +125,6 @@ def _plan(revision, spec, **config):
         ('assembler.sample',),
     ]
     final_steps.extend(dump_steps(ownerid, dataset, 'latest', final=True))
-    if not os.environ.get('PLANNER_LOCAL'):
-        final_steps.append(('aws.change_acl', {
-            'bucket': os.environ['PKGSTORE_BUCKET'],
-            'path': '{}/{}'.format(ownerid, dataset),
-            'acl': acl
-        }))
     final_steps.append(('assembler.add_indexing_resource', {
         'flow-id': pipeline_id()
     }))
@@ -134,6 +147,12 @@ def _plan(revision, spec, **config):
              }
          })
     )
+    if not os.environ.get('PLANNER_LOCAL'):
+        final_steps.append(('aws.change_acl', {
+            'bucket': os.environ['PKGSTORE_BUCKET'],
+            'path': '{}/{}'.format(ownerid, dataset),
+            'acl': acl
+        }))
     pipeline = {
         'update_time': update_time,
         'dependencies': dependencies,
