@@ -125,9 +125,6 @@ def _plan(revision, spec, **config):
         ('assembler.sample',),
     ]
     final_steps.extend(dump_steps(ownerid, dataset, 'latest', final=True))
-    final_steps.append(('assembler.add_indexing_resource', {
-        'flow-id': pipeline_id()
-    }))
     final_steps.append(
         ('elasticsearch.dump.to_index',
          {
@@ -136,12 +133,6 @@ def _plan(revision, spec, **config):
                      {
                          'resource-name': '__datasets',
                          'doc-type': 'dataset'
-                     }
-                 ],
-                 'events': [
-                    {
-                        'resource-name': '__events',
-                        'doc-type': 'event'
                      }
                  ]
              }
