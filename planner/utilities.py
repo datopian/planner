@@ -3,6 +3,7 @@ import os
 import urllib
 
 import boto3
+from botocore.client import Config
 
 PKGSTORE_BUCKET = os.environ.get('PKGSTORE_BUCKET')
 
@@ -48,10 +49,16 @@ def dump_steps(*parts, final=False):
 
 def get_s3_client():
     endpoint_url = os.environ.get("S3_ENDPOINT_URL")
-    s3_client = boto3.client('s3', endpoint_url=endpoint_url)
+    s3_client = boto3.client(
+        's3',
+        config=Config(signature_version='s3v4'),
+        endpoint_url=endpoint_url)
     if endpoint_url:
         try:
-            s3 = boto3.resource('s3', endpoint_url=endpoint_url)
+            s3 = boto3.resource(
+                's3',
+                config=Config(signature_version='s3v4'),
+                endpoint_url=endpoint_url)
             s3.create_bucket(Bucket=PKGSTORE_BUCKET)
             bucket = s3.Bucket(PKGSTORE_BUCKET)
             bucket.Acl().put(ACL='public-read')
