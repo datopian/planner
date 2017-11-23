@@ -68,15 +68,12 @@ def get_s3_client():
     return s3_client
 
 
-client = get_s3_client()
-
-
 def s3_path(*parts):
     if os.environ.get('PLANNER_LOCAL'):
         path = '/'.join(str(p) for p in parts)
         return path
     else:
-
+        client = get_s3_client()
         path = '/'.join(str(p) for p in parts)
         bucket = PKGSTORE_BUCKET
         if path.startswith('http'):
