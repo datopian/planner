@@ -41,16 +41,3 @@ def test_only_one_sink(spec, config):
     """Tests that the generated grapיh has only one sink"""
     flow = planner.plan(1, spec, **config)
     assert get_flow_sink(flow) is not None
-
-
-@pytest.mark.parametrize('spec', SPECS)
-@pytest.mark.parametrize('config', CONFIGS)
-def test_change_privacy_is_dependency_for_any_pipeline(spec, config):
-    """Tests that the generated grapיh has different pipline ids"""
-    flow = planner.plan(1, spec, **config)
-    pipeline_deps = [
-        pipeline['dependencies'] for pipeline_id, pipeline in flow \
-            if 'change_privacy' not in pipeline_id
-    ]
-    for deps in pipeline_deps:
-        assert any('change_privacy' in dep['pipeline'] for dep in deps)

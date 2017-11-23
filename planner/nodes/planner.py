@@ -10,6 +10,7 @@ import logging # noqa
 
 from .node_collector import collect_artifacts
 from .base_processing_node import ProcessingArtifact
+from ..utilities import s3_path
 
 
 def planner(datapackage_input, processing, outputs, allowed_types=None):
@@ -130,8 +131,8 @@ def planner(datapackage_input, processing, outputs, allowed_types=None):
             ri = resource_info[required_artifact.resource_name]
             if 'resource' in ri:
                 pipeline_steps.append(
-                    ('load_resource', {
-                        'url': ri['url'],
+                    ('assembler.load_private_resource', {
+                        'url': s3_path(ri['url']),
                         'resource': ri['resource'],
                         'stream': True
                     })
@@ -152,7 +153,7 @@ def planner(datapackage_input, processing, outputs, allowed_types=None):
             ri = resource_info[required_artifact.resource_name]
             if 'resource' in ri:
                 pipeline_steps.append(
-                    ('load_resource', {
+                    ('assembler.load_private_resource', {
                         'url': ri['url'],
                         'resource': ri['resource'],
                         'stream': False
