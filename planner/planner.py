@@ -62,8 +62,8 @@ def _plan(revision, spec, **config):
             inner_pipeline_id = pipeline_id(inner_pipeline_id)
             inner_pipeline_ids.append(inner_pipeline_id)
 
-            datapackage_url = s3_path(inner_pipeline_id, 'datapackage.json')
-            datapackage_url = datapackage_url.replace('/{}/'.format(revision), '/')
+            pid_without_revision = inner_pipeline_id.replace('/{}/'.format(revision), '/')
+            datapackage_url = s3_path(pid_without_revision, 'datapackage.json')
             urls.append(datapackage_url)
 
             path_without_revision = inner_pipeline_id.replace(
