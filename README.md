@@ -47,7 +47,7 @@ outputs:
     parameters: 
         out-file: <name of the file>
   - ... # other output formats
-
+schedule: 'every 1d' # s/m/h/d/w (second -> week)
 ```
 
 
