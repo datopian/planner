@@ -2,10 +2,12 @@ from .basic_nodes import DerivedCSVProcessingNode, DerivedJSONProcessingNode, \
     NonTabularProcessingNode
 from .view_nodes import DerivedPreviewProcessingNode
 from .output_nodes import OutputToZipProcessingNode
+from .report_nodes import ReportProcessingNode
 
 import itertools
 
 ORDERED_NODE_CLASSES = [
+    ReportProcessingNode,
     DerivedCSVProcessingNode,
     DerivedPreviewProcessingNode,
     DerivedJSONProcessingNode,
