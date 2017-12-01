@@ -9,7 +9,7 @@ class ReportProcessingNode(BaseProcessingNode):
 
     def get_artifacts(self):
         datahub_type = 'derived/report'
-        resource_name = 'datapackage_report'
+        resource_name = 'validation_report'
         tabular_artifacts = [
             artifact for artifact in self.available_artifacts
             if artifact.datahub_type == 'source/tabular'
