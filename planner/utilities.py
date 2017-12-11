@@ -9,7 +9,6 @@ PKGSTORE_BUCKET = os.environ.get('PKGSTORE_BUCKET')
 
 
 def dump_steps(*parts, final=False):
-    dumper = 'assembler.dump_to_s3' if final else 'aws.dump.to_s3'
     handle_non_tabular = False if final else True
     if os.environ.get('PLANNER_LOCAL'):
         return [('dump.to_path',
@@ -28,7 +27,7 @@ def dump_steps(*parts, final=False):
                      }
                  })]
     else:
-        return [(dumper,
+        return [('assembler.dump_to_s3',
                  {
                      'force-format': False,
                      'handle-non-tabular': handle_non_tabular,
@@ -36,6 +35,7 @@ def dump_steps(*parts, final=False):
                      'bucket': PKGSTORE_BUCKET,
                      'path': '/'.join(str(p) for p in parts),
                      'acl': 'private',
+                     'final': final,
                      'counters': {
                          "datapackage-rowcount": "datahub.stats.rowcount",
                          "datapackage-bytes": "datahub.stats.bytes",
