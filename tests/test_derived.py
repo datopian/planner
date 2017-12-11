@@ -33,3 +33,21 @@ def test_partial(spec, config):
     expected_num = len(config['allowed_types']) if spec['meta']['dataset'] == \
         'empty' else len(config['allowed_types']) + 1
     assert expected_num == len(formats)
+
+
+@pytest.mark.parametrize('spec', SPECS)
+@pytest.mark.parametrize('config', CONFIGS)
+def test_titles(spec, config):
+    """Tests for a derived resource to exist"""
+    flow = planner.plan(1, spec, **config)
+    titles = [
+        "Creating CSV",
+        "Creating JSON",
+        "Creating ZIP",
+        "Generating views",
+        "Validating package contents",
+        "Copying source data",
+        "Creating Package",
+    ]
+    for pipeline_id, pipeline_details in flow:
+        assert pipeline_details['title'] in titles

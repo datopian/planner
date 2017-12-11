@@ -58,7 +58,7 @@ def _plan(revision, spec, **config):
                               **config)
         datapackage_url = None
         while True:
-            inner_pipeline_id, pipeline_steps, dependencies = planner_gen.send(datapackage_url)
+            inner_pipeline_id, pipeline_steps, dependencies, title = planner_gen.send(datapackage_url)
             inner_pipeline_id = pipeline_id(inner_pipeline_id)
             inner_pipeline_ids.append(inner_pipeline_id)
 
@@ -74,7 +74,8 @@ def _plan(revision, spec, **config):
             pipeline = {
                 'pipeline': steps(*pipeline_steps),
                 'dependencies': dependencies,
-                'hooks': [FLOWMANAGER_HOOK_URL]
+                'hooks': [FLOWMANAGER_HOOK_URL],
+                'title': title
             }
             yield inner_pipeline_id, pipeline
 
@@ -128,7 +129,8 @@ def _plan(revision, spec, **config):
         'update_time': update_time,
         'dependencies': dependencies,
         'pipeline': steps(*final_steps),
-        'hooks': [FLOWMANAGER_HOOK_URL]
+        'hooks': [FLOWMANAGER_HOOK_URL],
+        'title': 'Creating Package'
     }
     # print('yielding', pipeline_id(), pipeline)
     yield pipeline_id(), pipeline

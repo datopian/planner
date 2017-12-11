@@ -8,13 +8,15 @@ class ProcessingArtifact():
                  required_streamed_artifacts: List['ProcessingArtifact'],
                  required_other_artifacts: List['ProcessingArtifact'],
                  pipeline_steps,
-                 streamable):
+                 streamable,
+                 title=''):
         self.datahub_type = datahub_type
         self.resource_name = resource_name
         self.required_streamed_artifacts = required_streamed_artifacts
         self.required_other_artifacts = required_other_artifacts
         self.pipeline_steps = pipeline_steps
         self.streamable = streamable
+        self.title = title
 
 
 class BaseProcessingNode():
