@@ -105,7 +105,7 @@ def _plan(revision, spec, **config):
          }),
         ('assembler.sample',),
     ]
-    final_steps.extend(dump_steps(ownerid, dataset, 'latest', final=True))
+    final_steps.extend(dump_steps(ownerid, dataset, revision, final=True))
     final_steps.append(
         ('elasticsearch.dump.to_index',
          {
