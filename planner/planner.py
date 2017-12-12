@@ -60,10 +60,10 @@ def _plan(revision, spec, **config):
                         'owner': owner,
                         'findability': findability,
                         'flowid': flow_id(),
-                        'stats': {
-                            'rowcount': 0,
-                            'bytes': 0,
-                        },
+                        # 'stats': {
+                        #     'rowcount': 0,
+                        #     'bytes': 0,
+                        # },
                         'modified': update_time,
                         'id': dataset_id()
                     })
