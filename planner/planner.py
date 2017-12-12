@@ -20,6 +20,9 @@ def _plan(revision, spec, **config):
             return '{ownerid}/{dataset}/{revision}'.format(**meta, revision=revision)
 
     def flow_id():
+        return pipeline_id()
+
+    def dataset_id():
         return '{ownerid}/{dataset}'.format(**meta)
 
     ownerid = meta['ownerid']
@@ -51,6 +54,20 @@ def _plan(revision, spec, **config):
         }
         outputs.append(zip_output)
 
+    datahub_step = ('assembler.update_metadata',
+                    {
+                        'ownerid': ownerid,
+                        'owner': owner,
+                        'findability': findability,
+                        'flowid': flow_id(),
+                        # 'stats': {
+                        #     'rowcount': 0,
+                        #     'bytes': 0,
+                        # },
+                        'modified': update_time,
+                        'id': dataset_id()
+                    })
+
     def planner_pipelines():
         planner_gen = planner(input,
                               spec.get('processing', []),
@@ -68,6 +85,7 @@ def _plan(revision, spec, **config):
 
             path_without_revision = inner_pipeline_id.replace(
                 '/{}/'.format(revision), '/')
+            pipeline_steps.insert(0, datahub_step)
             pipeline_steps.extend(dump_steps(path_without_revision))
             dependencies = [dict(pipeline=pipeline_id(r)) for r in dependencies]
 
@@ -87,18 +105,7 @@ def _plan(revision, spec, **config):
          {
              'url': input['url']
          }),
-        ('assembler.update_metadata',
-         {
-             'ownerid': ownerid,
-             'owner': owner,
-             'findability': findability,
-             'stats': {
-                 'rowcount': 0,
-                 'bytes': 0,
-             },
-             'modified': update_time,
-             'id': flow_id()
-         }),
+        datahub_step,
         ('assembler.load_modified_resources',
          {
              'urls': urls
