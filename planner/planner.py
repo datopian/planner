@@ -49,7 +49,7 @@ def _plan(revision, spec, **config):
         zip_output = {
             'kind': 'zip',
             'parameters': {
-                'out-file': '/tmp/%s.%s.%s.zip' % (meta['ownerid'], meta['dataset'], revision)
+                'out-file': '%s.zip' % (meta['dataset'])
             }
         }
         outputs.append(zip_output)
