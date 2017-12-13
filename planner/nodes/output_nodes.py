@@ -1,8 +1,7 @@
-import tempfile
 import os
+import random
 
 from .base_processing_node import BaseProcessingNode, ProcessingArtifact
-tmp_path = tempfile.mkdtemp()
 
 
 class OutputToZipProcessingNode(BaseProcessingNode):
@@ -15,7 +14,9 @@ class OutputToZipProcessingNode(BaseProcessingNode):
         zip_params = [out for out in self.outputs if out['kind'] == 'zip']
         if len(zip_params):
             out_file = zip_params[0]['parameters']['out-file']
-            tmp_zip = os.path.join(tmp_path, out_file)
+            # add random number to avoid collisions
+            tmp_zip = os.path.join('/tmp', '%s.%s' % (
+                random.randrange(1000), out_file))
             datahub_type = 'derived/{}'.format(self.fmt)
             resource_name = out_file.replace('.', '_')
             output = ProcessingArtifact(
