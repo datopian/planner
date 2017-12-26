@@ -120,7 +120,8 @@ def _plan(revision, spec, **config):
                  'datahub': [
                      {
                          'resource-name': '__datasets',
-                         'doc-type': 'dataset'
+                         'doc-type': 'dataset',
+                         'update': True
                      }
                  ]
              }
