@@ -21,15 +21,23 @@ inputs:
       descriptor: <datapackage-descriptor>
       resource-mapping:
         <resource-name-or-path>: <resource-url>
-        
+
 processing:
  - # Processing steps that need to be done on sources to get proper data streams
    input: <source-resource-name - e.g. `my-excel-resource`>
    output: <destination-resource-name - e.g. `my-excel-resource-sheet-1`>
-   tabulator: # Currently we're only supporting tabulator transformations
+   tabulator:
      # These are sample options for tabulator, see its docs for all available options
-     headers: 2 
+     headers: 2
      sheet: 1
+ -
+   input: <source-resource-name - e.g. `my-excel-resource`>
+   output: <destination-resource-name - e.g. `my-excel-resource-sheet-1`>
+   dpp:
+     - run: sort
+       parameters:
+         resources: resource1
+         sort-by: fullname
 
 outputs:
   -
@@ -44,7 +52,7 @@ outputs:
       credentials: <tbd, should be the name of a user provided configuration - not the actual credentials>
   -
     kind: zip (dump.to_zip)
-    parameters: 
+    parameters:
         out-file: <name of the file>
   - ... # other output formats
 schedule: 'every 1d' # s/m/h/d/w (second -> week)
