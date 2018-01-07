@@ -113,19 +113,6 @@ def _plan(revision, spec, **config):
         ('assembler.sample',),
     ]
     final_steps.extend(dump_steps(ownerid, dataset, revision, final=True))
-    final_steps.append(
-        ('elasticsearch.dump.to_index',
-         {
-             'indexes': {
-                 'datahub': [
-                     {
-                         'resource-name': '__datasets',
-                         'doc-type': 'dataset'
-                     }
-                 ]
-             }
-         })
-    )
     if not os.environ.get('PLANNER_LOCAL'):
         final_steps.append(('aws.change_acl', {
             'bucket': os.environ['PKGSTORE_BUCKET'],
