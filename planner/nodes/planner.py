@@ -128,7 +128,7 @@ def planner(datapackage_input, processing, outputs, allowed_types=None):
     ]
     for derived_artifact in collect_artifacts(artifacts, outputs, allowed_types):
         pipeline_steps: List[Tuple] = [
-            ('add_metadata', {'name': derived_artifact.resource_name}),
+            ('load_metadata', {'url': datapackage_input['url']}),
         ]
 
         required_artifact_pipeline_steps = []
