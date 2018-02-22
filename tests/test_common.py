@@ -17,6 +17,7 @@ def test_connected(spec, config):
     while added:
         added = False
         for pipeline_id, pipeline in flow:
+            pipeline_id = './' + pipeline_id
             if pipeline_id not in connected_set:
                 deps = [x['pipeline'] for x in pipeline.get('dependencies')]
                 print(pipeline_id, deps)

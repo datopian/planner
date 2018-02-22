@@ -6,8 +6,6 @@ from datapackage_pipelines.generators import steps
 from .nodes.planner import planner
 from .utilities import s3_path, dump_steps
 
-FLOWMANAGER_HOOK_URL = os.environ.get('FLOWMANAGER_HOOK_URL')
-
 
 def _plan(revision, spec, **config):
     """Plan a flow according to spec"""
@@ -87,19 +85,18 @@ def _plan(revision, spec, **config):
                 '/{}/'.format(revision), '/')
             pipeline_steps.insert(0, datahub_step)
             pipeline_steps.extend(dump_steps(path_without_revision))
-            dependencies = [dict(pipeline=pipeline_id(r)) for r in dependencies]
+            dependencies = [dict(pipeline='./'+pipeline_id(r)) for r in dependencies]
 
             pipeline = {
                 'pipeline': steps(*pipeline_steps),
                 'dependencies': dependencies,
-                'hooks': [FLOWMANAGER_HOOK_URL],
                 'title': title
             }
             yield inner_pipeline_id, pipeline
 
     yield from planner_pipelines()
 
-    dependencies = [dict(pipeline=pid) for pid in inner_pipeline_ids]
+    dependencies = [dict(pipeline='./'+pid) for pid in inner_pipeline_ids]
     final_steps = [
         ('load_metadata',
          {
@@ -123,7 +120,6 @@ def _plan(revision, spec, **config):
         'update_time': update_time,
         'dependencies': dependencies,
         'pipeline': steps(*final_steps),
-        'hooks': [FLOWMANAGER_HOOK_URL],
         'title': 'Creating Package'
     }
     # print('yielding', pipeline_id(), pipeline)
