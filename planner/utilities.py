@@ -17,6 +17,7 @@ def dump_steps(*parts, final=False):
                      'handle-non-tabular': handle_non_tabular,
                      'add-filehash-to-path': True,
                      'out-path': '/'.join(str(p) for p in parts),
+                     'pretty-descriptor': True,
                      'counters': {
                          "datapackage-rowcount": "datahub.stats.rowcount",
                          "datapackage-bytes": "datahub.stats.bytes",
@@ -34,6 +35,7 @@ def dump_steps(*parts, final=False):
                      'add-filehash-to-path': True,
                      'bucket': PKGSTORE_BUCKET,
                      'path': '/'.join(str(p) for p in parts),
+                     'pretty-descriptor': True,
                      'acl': 'private',
                      'final': final,
                      'counters': {
