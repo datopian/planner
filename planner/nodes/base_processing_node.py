@@ -9,7 +9,8 @@ class ProcessingArtifact():
                  required_other_artifacts: List['ProcessingArtifact'],
                  pipeline_steps,
                  streamable,
-                 title=''):
+                 title='',
+                 limit_streamed_rows=None):
         self.datahub_type = datahub_type
         self.resource_name = resource_name
         self.required_streamed_artifacts = required_streamed_artifacts
@@ -17,6 +18,7 @@ class ProcessingArtifact():
         self.pipeline_steps = pipeline_steps
         self.streamable = streamable
         self.title = title
+        self.limit_streamed_rows = limit_streamed_rows
 
 
 class BaseProcessingNode():
