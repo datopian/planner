@@ -133,6 +133,7 @@ def planner(datapackage_input, processing, outputs, allowed_types=None):
 
         required_artifact_pipeline_steps = []
         needs_streaming = False
+        stream_params = {}
         for required_artifact in derived_artifact.required_streamed_artifacts:
             ri = resource_info[required_artifact.resource_name]
             if 'resource' in ri:
@@ -140,18 +141,21 @@ def planner(datapackage_input, processing, outputs, allowed_types=None):
                     ('assembler.load_private_resource', {
                         'url': s3_path(ri['url']),
                         'resource': ri['resource'],
-                        'stream': True
+                        'stream': True,
+                        'limit-rows': required_artifact.limit_streamed_rows
                     })
                 )
             else:
                 pipeline_steps.append(('add_resource', ri))
                 needs_streaming = True
+                if required_artifact.limit_streamed_rows:
+                    stream_params['limit-rows'] = required_artifact.limit_streamed_rows
             required_artifact_pipeline_steps.extend(required_artifact.pipeline_steps)
 
         if needs_streaming:
             pipeline_steps.extend([
-                ('assembler.sample',),
-                ('stream_remote_resources',)
+                # ('assembler.sample',),
+                ('stream_remote_resources', stream_params)
             ])
 
         pipeline_steps.extend(required_artifact_pipeline_steps)
