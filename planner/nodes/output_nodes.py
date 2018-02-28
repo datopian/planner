@@ -22,7 +22,8 @@ class OutputToZipProcessingNode(BaseProcessingNode):
             output = ProcessingArtifact(
                 datahub_type, resource_name,
                 [], self.available_artifacts,
-                [('assembler.remove_hash', {}),
+                [('assembler.extract_readme', {}),
+                 ('assembler.remove_hash', {}),
                  ('dump.to_zip', {
                     'out-file': tmp_zip,
                     'force-format': False,
