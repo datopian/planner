@@ -4,32 +4,25 @@ import os
 from datapackage_pipelines.generators import steps
 
 from .nodes.planner import planner
-from .utilities import s3_path, dump_steps
+from .utilities import dump_steps
 
 
 def _plan(revision, spec, **config):
     """Plan a flow according to spec"""
     meta = spec['meta']
 
-    def pipeline_id(r=None):
-        if r is not None:
-            return '{ownerid}/{dataset}/{revision}/{suffix}'.format(**meta, suffix=r, revision=revision)
-        else:
-            return '{ownerid}/{dataset}/{revision}'.format(**meta, revision=revision)
-
-    def flow_id():
-        return pipeline_id()
-
-    def dataset_id():
-        return '{ownerid}/{dataset}'.format(**meta)
+    flow_id = '{ownerid}/{dataset}/{revision}'.format(**meta, revision=revision)
+    dataset_id = '{ownerid}/{dataset}'.format(**meta)
 
     ownerid = meta['ownerid']
     dataset = meta['dataset']
     owner = meta.get('owner')
+
     findability = meta.get('findability', 'published')
     acl = 'public-read'
     if findability == 'private':
         acl = 'private'
+
     update_time = meta.get('update_time')
 
     inputs = spec.get('inputs', [])
@@ -38,7 +31,6 @@ def _plan(revision, spec, **config):
     input = inputs[0]
     assert input['kind'] == 'datapackage', 'Only supporting datapackage inputs atm'
 
-    urls = []
     inner_pipeline_ids = []
 
     outputs = spec.get('outputs', [])
@@ -57,35 +49,31 @@ def _plan(revision, spec, **config):
                         'ownerid': ownerid,
                         'owner': owner,
                         'findability': findability,
-                        'flowid': flow_id(),
+                        'flowid': flow_id,
                         # 'stats': {
                         #     'rowcount': 0,
                         #     'bytes': 0,
                         # },
                         'modified': update_time,
-                        'id': dataset_id()
+                        'id': dataset_id
                     })
 
     def planner_pipelines():
         planner_gen = planner(input,
+                              flow_id,
                               spec.get('processing', []),
                               outputs,
                               **config)
-        datapackage_url = None
+        inner_pipeline_id = None
         while True:
-            inner_pipeline_id, pipeline_steps, dependencies, title = planner_gen.send(datapackage_url)
-            inner_pipeline_id = pipeline_id(inner_pipeline_id)
+            inner_pipeline_id, pipeline_steps, dependencies, title = planner_gen.send(inner_pipeline_id)
             inner_pipeline_ids.append(inner_pipeline_id)
 
             pid_without_revision = inner_pipeline_id.replace('/{}/'.format(revision), '/')
-            datapackage_url = s3_path(pid_without_revision, 'datapackage.json')
-            urls.append(datapackage_url)
 
-            path_without_revision = inner_pipeline_id.replace(
-                '/{}/'.format(revision), '/')
             pipeline_steps.insert(0, datahub_step)
-            pipeline_steps.extend(dump_steps(path_without_revision))
-            dependencies = [dict(pipeline='./'+pipeline_id(r)) for r in dependencies]
+            pipeline_steps.extend(dump_steps(pid_without_revision))
+            dependencies = [dict(pipeline='./'+d) for d in dependencies]
 
             pipeline = {
                 'pipeline': steps(*pipeline_steps),
@@ -93,6 +81,7 @@ def _plan(revision, spec, **config):
                 'title': title
             }
             yield inner_pipeline_id, pipeline
+            inner_pipeline_id = 'dependency://./'+inner_pipeline_id
 
     yield from planner_pipelines()
 
@@ -105,11 +94,10 @@ def _plan(revision, spec, **config):
         datahub_step,
         ('assembler.load_modified_resources',
          {
-             'urls': urls
+             'urls': dependencies
          }),
-        ('assembler.sample',),
     ]
-    final_steps.extend(dump_steps(ownerid, dataset, revision, final=True))
+    final_steps.extend(dump_steps(flow_id, final=True))
     if not os.environ.get('PLANNER_LOCAL'):
         final_steps.append(('aws.change_acl', {
             'bucket': os.environ['PKGSTORE_BUCKET'],
@@ -123,7 +111,7 @@ def _plan(revision, spec, **config):
         'title': 'Creating Package'
     }
     # print('yielding', pipeline_id(), pipeline)
-    yield pipeline_id(), pipeline
+    yield flow_id, pipeline
 
 
 def plan(revision, spec, **config):
