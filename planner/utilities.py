@@ -8,45 +8,44 @@ from botocore.client import Config
 PKGSTORE_BUCKET = os.environ.get('PKGSTORE_BUCKET')
 
 
-def dump_steps(*parts, final=False):
+def dump_steps(path, final=False):
     handle_non_tabular = False if final else True
-    if os.environ.get('PLANNER_LOCAL'):
-        return [('dump.to_path',
-                 {
-                     'force-format': False,
-                     'handle-non-tabular': handle_non_tabular,
-                     'add-filehash-to-path': True,
-                     'out-path': '/'.join(str(p) for p in parts),
-                     'pretty-descriptor': True,
-                     'counters': {
-                         "datapackage-rowcount": "datahub.stats.rowcount",
-                         "datapackage-bytes": "datahub.stats.bytes",
-                         "datapackage-hash": "datahub.hash",
-                         "resource-rowcount": "rowcount",
-                         "resource-bytes": "bytes",
-                         "resource-hash": "hash",
-                     }
-                 })]
-    else:
-        return [('assembler.dump_to_s3',
-                 {
-                     'force-format': False,
-                     'handle-non-tabular': handle_non_tabular,
-                     'add-filehash-to-path': True,
-                     'bucket': PKGSTORE_BUCKET,
-                     'path': '/'.join(str(p) for p in parts),
-                     'pretty-descriptor': True,
-                     'acl': 'private',
-                     'final': final,
-                     'counters': {
-                         "datapackage-rowcount": "datahub.stats.rowcount",
-                         "datapackage-bytes": "datahub.stats.bytes",
-                         "datapackage-hash": "datahub.hash",
-                         "resource-rowcount": "rowcount",
-                         "resource-bytes": "bytes",
-                         "resource-hash": "hash",
-                     }
-                 })]
+    steps = [('dump.to_path',
+              {
+                  'force-format': False,
+                  'handle-non-tabular': handle_non_tabular,
+                  'add-filehash-to-path': True,
+                  'out-path': path,
+                  'pretty-descriptor': True,
+                  'counters': {
+                      "datapackage-rowcount": "datahub.stats.rowcount",
+                      "datapackage-bytes": "datahub.stats.bytes",
+                      "datapackage-hash": "datahub.hash",
+                      "resource-rowcount": "rowcount",
+                      "resource-bytes": "bytes",
+                      "resource-hash": "hash",
+                  }
+              })]
+    if not os.environ.get('PLANNER_LOCAL'):
+        steps.extend([('assembler.dump_to_s3',
+                       {
+                           'force-format': False,
+                           'handle-non-tabular': handle_non_tabular,
+                           'add-filehash-to-path': True,
+                           'bucket': PKGSTORE_BUCKET,
+                           'path': path,
+                           'pretty-descriptor': True,
+                           'acl': 'private',
+                           'counters': {
+                                "datapackage-rowcount": "datahub.stats.rowcount",
+                                "datapackage-bytes": "datahub.stats.bytes",
+                                "datapackage-hash": "datahub.hash",
+                                "resource-rowcount": "rowcount",
+                                "resource-bytes": "bytes",
+                                "resource-hash": "hash",
+                            }
+                       })])
+    return steps
 
 
 def get_s3_client():
@@ -70,22 +69,24 @@ def get_s3_client():
     return s3_client
 
 
-client = get_s3_client()
+_client = None
 
 
-def s3_path(*parts):
-    if os.environ.get('PLANNER_LOCAL'):
-        path = '/'.join(str(p) for p in parts)
-        return path
-    else:
-        path = '/'.join(str(p) for p in parts)
+def client():
+    global _client
+    if _client is None:
+        _client = get_s3_client()
+    return _client
+
+
+def s3_path(path):
+    if path.startswith('http'):
         bucket = PKGSTORE_BUCKET
-        if path.startswith('http'):
-            parsed_url = urllib.parse.urlparse(path)
-            path = parsed_url.path.lstrip('/')
-            if path.startswith(bucket):
-                _, path = path.split('/', 1)
-        url = client.generate_presigned_url(
+        parsed_url = urllib.parse.urlparse(path)
+        path = parsed_url.path.lstrip('/')
+        if path.startswith(bucket):
+            _, path = path.split('/', 1)
+        url = client().generate_presigned_url(
             ClientMethod='get_object',
             Params={
                 'Bucket': bucket,
@@ -93,3 +94,4 @@ def s3_path(*parts):
             },
             ExpiresIn=3600*6)
         return url
+    return path
