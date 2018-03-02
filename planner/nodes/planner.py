@@ -13,7 +13,7 @@ from .base_processing_node import ProcessingArtifact
 from ..utilities import s3_path
 
 
-def planner(datapackage_input, processing, outputs, allowed_types=None):
+def planner(datapackage_input, prefix, processing, outputs, allowed_types=None):
     parameters = datapackage_input.get('parameters')
     datapackage_url = datapackage_input['url']
     datapackage_descriptor = parameters.get('descriptor')
@@ -154,7 +154,6 @@ def planner(datapackage_input, processing, outputs, allowed_types=None):
 
         if needs_streaming:
             pipeline_steps.extend([
-                # ('assembler.sample',),
                 ('stream_remote_resources', stream_params)
             ])
 
@@ -176,15 +175,14 @@ def planner(datapackage_input, processing, outputs, allowed_types=None):
                 )
 
         pipeline_steps.extend(derived_artifact.pipeline_steps)
-        pipeline_steps.extend([
-            ('assembler.sample',),
-        ])
-        dependencies = [ra.resource_name
+        dependencies = [prefix + '/' + ra.resource_name
                         for ra in (derived_artifact.required_streamed_artifacts +
                                    derived_artifact.required_other_artifacts)
                         if ra.datahub_type not in ('source/tabular', 'source/non-tabular')]
-        datapackage_url = yield derived_artifact.resource_name, pipeline_steps, \
-            dependencies, derived_artifact.title, derived_artifact.content_type
+
+        datapackage_url = yield (prefix + '/' + derived_artifact.resource_name,
+                                 pipeline_steps, dependencies,
+                                 derived_artifact.title, derived_artifact.content_type)
 
         resource_info[derived_artifact.resource_name] = {
             'resource': derived_artifact.resource_name,
