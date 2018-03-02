@@ -109,7 +109,7 @@ def _plan(revision, spec, **config):
          }),
         ('assembler.sample',),
     ]
-    final_steps.extend(dump_steps(ownerid, dataset, revision, final=True, content_type='application/json'))
+    final_steps.extend(dump_steps(ownerid, dataset, revision, content_type='application/json', final=True))
     if not os.environ.get('PLANNER_LOCAL'):
         final_steps.append(('aws.change_acl', {
             'bucket': os.environ['PKGSTORE_BUCKET'],

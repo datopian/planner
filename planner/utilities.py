@@ -8,7 +8,7 @@ from botocore.client import Config
 PKGSTORE_BUCKET = os.environ.get('PKGSTORE_BUCKET')
 
 
-def dump_steps(*parts, final=False, content_type=None):
+def dump_steps(*parts, content_type, final=False):
     handle_non_tabular = False if final else True
     if os.environ.get('PLANNER_LOCAL'):
         return [('dump.to_path',
@@ -18,7 +18,6 @@ def dump_steps(*parts, final=False, content_type=None):
                      'add-filehash-to-path': True,
                      'out-path': '/'.join(str(p) for p in parts),
                      'pretty-descriptor': True,
-                     'content_type': content_type,
                      'counters': {
                          "datapackage-rowcount": "datahub.stats.rowcount",
                          "datapackage-bytes": "datahub.stats.bytes",
@@ -38,6 +37,7 @@ def dump_steps(*parts, final=False, content_type=None):
                      'path': '/'.join(str(p) for p in parts),
                      'pretty-descriptor': True,
                      'acl': 'private',
+                     'content_type': content_type,
                      'final': final,
                      'counters': {
                          "datapackage-rowcount": "datahub.stats.rowcount",
