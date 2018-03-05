@@ -86,11 +86,13 @@ def _plan(revision, spec, **config):
     yield from planner_pipelines()
 
     dependencies = [dict(pipeline='./'+pid) for pid in inner_pipeline_ids]
+    datapackage_descriptor = input['parameters']['descriptor']
     final_steps = [
-        ('load_metadata',
-         {
-             'url': input['url']
-         }),
+        ('add_metadata', dict(
+            (k, v)
+            for k, v in datapackage_descriptor.items()
+            if k != 'resources'
+        )),
         datahub_step,
         ('assembler.load_modified_resources',
          {
