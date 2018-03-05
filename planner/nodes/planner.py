@@ -179,9 +179,10 @@ def planner(datapackage_input, prefix, processing, outputs, allowed_types=None):
                         for ra in (derived_artifact.required_streamed_artifacts +
                                    derived_artifact.required_other_artifacts)
                         if ra.datahub_type not in ('source/tabular', 'source/non-tabular')]
+
         datapackage_url = yield (prefix + '/' + derived_artifact.resource_name,
                                  pipeline_steps, dependencies,
-                                 derived_artifact.title)
+                                 derived_artifact.title, derived_artifact.content_type)
 
         resource_info[derived_artifact.resource_name] = {
             'resource': derived_artifact.resource_name,

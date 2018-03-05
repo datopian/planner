@@ -34,6 +34,6 @@ class DerivedPreviewProcessingNode(BaseProcessingNode):
                       }),
                      ('assembler.load_preview', {'limit': 2000}),
                      ('assembler.load_views', {'limit': 2000})],
-                    True, 'Generating views', 2000
+                    True, 'Generating views', 2000, content_type='application/json'
                 )
                 yield output

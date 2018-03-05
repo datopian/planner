@@ -18,5 +18,5 @@ class ReportProcessingNode(BaseProcessingNode):
             datahub_type, resource_name,
             [], tabular_artifacts,
             [('assembler.validate_resource', {})],
-            False, 'Validating package contents')
+            False, 'Validating package contents', content_type='application/json')
         yield output

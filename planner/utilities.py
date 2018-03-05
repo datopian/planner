@@ -8,7 +8,7 @@ from botocore.client import Config
 PKGSTORE_BUCKET = os.environ.get('PKGSTORE_BUCKET')
 
 
-def dump_steps(path, final=False):
+def dump_steps(path, content_type, final=False):
     handle_non_tabular = False if final else True
     steps = [('dump.to_path',
               {
@@ -35,6 +35,7 @@ def dump_steps(path, final=False):
                            'bucket': PKGSTORE_BUCKET,
                            'path': path,
                            'pretty-descriptor': True,
+                           'content_type': content_type,
                            'acl': 'private',
                            'counters': {
                                 "datapackage-rowcount": "datahub.stats.rowcount",

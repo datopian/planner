@@ -10,7 +10,8 @@ class ProcessingArtifact():
                  pipeline_steps,
                  streamable,
                  title='',
-                 limit_streamed_rows=None):
+                 limit_streamed_rows=None,
+                 content_type='application/octet-stream'):
         self.datahub_type = datahub_type
         self.resource_name = resource_name
         self.required_streamed_artifacts = required_streamed_artifacts
@@ -19,6 +20,7 @@ class ProcessingArtifact():
         self.streamable = streamable
         self.title = title
         self.limit_streamed_rows = limit_streamed_rows
+        self.content_type = content_type
 
 
 class BaseProcessingNode():

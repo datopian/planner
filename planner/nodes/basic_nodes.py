@@ -1,3 +1,5 @@
+from mimetypes import guess_type
+
 from .base_processing_node import BaseProcessingNode, ProcessingArtifact
 
 
@@ -11,6 +13,8 @@ class DerivedFormatProcessingNode(BaseProcessingNode):
             if artifact.datahub_type == 'source/tabular':
                 datahub_type = 'derived/{}'.format(self.fmt)
                 resource_name = artifact.resource_name + '_{}'.format(self.fmt)
+                file_path = 'data/{}.{}'.format(resource_name, self.fmt)
+                content_type, _ = guess_type(file_path)
                 output = ProcessingArtifact(
                     datahub_type, resource_name,
                     [artifact], [],
@@ -20,7 +24,7 @@ class DerivedFormatProcessingNode(BaseProcessingNode):
                           'update': {
                               'name': resource_name,
                               'format': self.fmt,
-                              'path': 'data/{}.{}'.format(resource_name, self.fmt),
+                              'path': file_path,
                               'datahub': {
                                 'type': datahub_type,
                                 'derivedFrom': [
@@ -30,7 +34,8 @@ class DerivedFormatProcessingNode(BaseProcessingNode):
                           }
                       })],
                     True,
-                    'Creating %s' % self.fmt.upper()
+                    'Creating %s' % self.fmt.upper(),
+                    content_type=content_type
                 )
                 yield output
 

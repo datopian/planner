@@ -66,13 +66,13 @@ def _plan(revision, spec, **config):
                               **config)
         inner_pipeline_id = None
         while True:
-            inner_pipeline_id, pipeline_steps, dependencies, title = planner_gen.send(inner_pipeline_id)
+            inner_pipeline_id, pipeline_steps, dependencies, title, content_type = planner_gen.send(inner_pipeline_id)
             inner_pipeline_ids.append(inner_pipeline_id)
 
             pid_without_revision = inner_pipeline_id.replace('/{}/'.format(revision), '/')
 
             pipeline_steps.insert(0, datahub_step)
-            pipeline_steps.extend(dump_steps(pid_without_revision))
+            pipeline_steps.extend(dump_steps(pid_without_revision, content_type=content_type))
             dependencies = [dict(pipeline='./'+d) for d in dependencies]
 
             pipeline = {
@@ -97,7 +97,7 @@ def _plan(revision, spec, **config):
              'urls': dependencies
          }),
     ]
-    final_steps.extend(dump_steps(flow_id, final=True))
+    final_steps.extend(dump_steps(flow_id, content_type='application/json', final=True))
     if not os.environ.get('PLANNER_LOCAL'):
         final_steps.append(('aws.change_acl', {
             'bucket': os.environ['PKGSTORE_BUCKET'],
