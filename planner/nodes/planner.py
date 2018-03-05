@@ -150,6 +150,9 @@ def planner(datapackage_input, prefix, processing, outputs, allowed_types=None):
                     })
                 )
             else:
+                if ri.get('signed') is None:
+                    ri['signed'] = True
+                    ri['url'] = s3_path(ri['url'])
                 pipeline_steps.append(('add_resource', ri))
                 needs_streaming = True
                 if required_artifact.limit_streamed_rows:
