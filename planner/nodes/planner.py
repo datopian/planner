@@ -38,7 +38,7 @@ def planner(datapackage_input, prefix, processing, outputs, allowed_types=None):
 
     # Add types for all resources
     resource_mapping = parameters.get('resource-mapping', {})
-    # print('PLAN resource_mapping', resource_mapping)
+    tabular_info = []
     for descriptor in resource_info:
         path = descriptor['path']
         name = descriptor['name']
@@ -74,15 +74,20 @@ def planner(datapackage_input, prefix, processing, outputs, allowed_types=None):
                 descriptor['geojsonSchema'] = schema
 
         if 'schema' in descriptor:
-            descriptor['datahub'] = {
+            tabular_descriptor = deepcopy(descriptor)
+
+            tabular_descriptor['datahub'] = {
                 'type': 'source/tabular'
             }
-        else:
-            descriptor['datahub'] = {
-                'type': 'source/non-tabular'
-            }
+            tabular_descriptor['name'] += '_processing'
+            tabular_info.append(tabular_descriptor)
 
-    # print('PLAN AFTER resource_info', resource_info)
+        descriptor['datahub'] = {
+            'type': 'original'
+        }
+        descriptor['path'] = os.path.join('archive', '{}.{}'.format(name, extension))
+
+    resource_info.extend(tabular_info)
 
     # Processing on resources
     processed_resources = set(p['input'] for p in processing)
@@ -185,7 +190,7 @@ def planner(datapackage_input, prefix, processing, outputs, allowed_types=None):
         dependencies = [prefix + '/' + ra.resource_name
                         for ra in (derived_artifact.required_streamed_artifacts +
                                    derived_artifact.required_other_artifacts)
-                        if ra.datahub_type not in ('source/tabular', 'source/non-tabular')]
+                        if ra.datahub_type not in ('source/tabular', 'original')]
 
         datapackage_url = yield (prefix + '/' + derived_artifact.resource_name,
                                  pipeline_steps, dependencies,

@@ -50,13 +50,13 @@ class DerivedJSONProcessingNode(DerivedFormatProcessingNode):
         super(DerivedJSONProcessingNode, self).__init__(available_artifacts, 'json')
 
 
-class NonTabularProcessingNode(BaseProcessingNode):
+class OriginalProcessingNode(BaseProcessingNode):
     def __init__(self, available_artifacts, outputs):
-        super(NonTabularProcessingNode, self).__init__(available_artifacts, outputs)
+        super(OriginalProcessingNode, self).__init__(available_artifacts, outputs)
 
     def get_artifacts(self):
         for artifact in self.available_artifacts:
-            if artifact.datahub_type == 'source/tabular' or artifact.datahub_type == 'source/non-tabular':
+            if artifact.datahub_type == 'original':
                 datahub_type = artifact.datahub_type
                 resource_name = artifact.resource_name
                 output = ProcessingArtifact(
