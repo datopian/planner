@@ -128,7 +128,11 @@ def planner(datapackage_input, prefix, processing, outputs, allowed_types=None):
     ]
     for derived_artifact in collect_artifacts(artifacts, outputs, allowed_types):
         pipeline_steps: List[Tuple] = [
-            ('load_metadata', {'url': datapackage_input['url']}),
+            ('add_metadata', dict(
+                (k, v)
+                for k, v in datapackage_descriptor.items()
+                if k != 'resources'
+            )),
         ]
 
         required_artifact_pipeline_steps = []
@@ -146,6 +150,9 @@ def planner(datapackage_input, prefix, processing, outputs, allowed_types=None):
                     })
                 )
             else:
+                if ri.get('signed') is None:
+                    ri['signed'] = True
+                    ri['url'] = s3_path(ri['url'])
                 pipeline_steps.append(('add_resource', ri))
                 needs_streaming = True
                 if required_artifact.limit_streamed_rows:
