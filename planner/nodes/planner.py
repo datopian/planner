@@ -79,13 +79,13 @@ def planner(datapackage_input, prefix, processing, outputs, allowed_types=None):
             tabular_descriptor['datahub'] = {
                 'type': 'source/tabular'
             }
-            tabular_descriptor['name'] += '_processing'
             tabular_info.append(tabular_descriptor)
 
         descriptor['datahub'] = {
             'type': 'original'
         }
         descriptor['path'] = os.path.join('archive', '{}.{}'.format(name, extension))
+        descriptor['name'] += '_original'
 
     resource_info.extend(tabular_info)
 
