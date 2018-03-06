@@ -12,7 +12,7 @@ class DerivedFormatProcessingNode(BaseProcessingNode):
         for artifact in self.available_artifacts:
             if artifact.datahub_type == 'source/tabular':
                 datahub_type = 'derived/{}'.format(self.fmt)
-                resource_name = artifact.resource_name + '_{}'.format(self.fmt)
+                resource_name = artifact.resource_name.replace('_processing', '') + '_{}'.format(self.fmt)
                 file_path = 'data/{}.{}'.format(resource_name, self.fmt)
                 content_type, _ = guess_type(file_path)
                 output = ProcessingArtifact(
