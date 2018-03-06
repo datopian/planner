@@ -81,8 +81,8 @@ def client():
 
 
 def s3_path(path):
-    if path.startswith('http'):
-        bucket = PKGSTORE_BUCKET
+    bucket = PKGSTORE_BUCKET
+    if path.startswith('http') and '/{}/'.format(bucket) in path:
         parsed_url = urllib.parse.urlparse(path)
         path = parsed_url.path.lstrip('/')
         if path.startswith(bucket):
