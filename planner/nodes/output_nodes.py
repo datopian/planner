@@ -19,13 +19,10 @@ class OutputToZipProcessingNode(BaseProcessingNode):
                 random.randrange(1000), out_file))
             datahub_type = 'derived/{}'.format(self.fmt)
             resource_name = out_file.replace('.', '_')
-            # Exclude source/tabular as in zip it's duplicate of derived/csv
-            artifacts = [
-                a for a in self.available_artifacts if a.datahub_type != 'source/tabular'
-            ]
+
             output = ProcessingArtifact(
                 datahub_type, resource_name,
-                [], artifacts,
+                [], self.available_artifacts,
                 [('assembler.extract_readme', {}),
                  ('assembler.remove_hash', {}),
                  ('dump.to_zip', {

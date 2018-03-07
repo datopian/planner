@@ -56,19 +56,17 @@ class OriginalProcessingNode(BaseProcessingNode):
 
     def get_artifacts(self):
         for artifact in self.available_artifacts:
-            if artifact.datahub_type == 'original':
-                datahub_type = artifact.datahub_type
-                resource_name = artifact.resource_name.replace('_original', '')
+            if artifact.datahub_type == 'original' or artifact.datahub_type == 'source/tabular':
                 output = ProcessingArtifact(
-                    datahub_type, resource_name,
+                    artifact.datahub_type, artifact.resource_name,
                     [], [artifact],
                     [('assembler.update_resource',
                       {
                           'name': artifact.resource_name,
                           'update': {
-                              'name': resource_name,
+                              'name': artifact.resource_name,
                               'datahub': {
-                                'type': datahub_type
+                                'type': artifact.datahub_type
                               }
                           }
                       })],
