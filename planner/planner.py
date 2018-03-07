@@ -24,6 +24,7 @@ def _plan(revision, spec, **config):
         acl = 'private'
 
     update_time = meta.get('update_time')
+    create_time = meta.get('create_time')
 
     inputs = spec.get('inputs', [])
     assert len(inputs) == 1, 'Only supporting one input atm'
@@ -50,11 +51,8 @@ def _plan(revision, spec, **config):
                         'owner': owner,
                         'findability': findability,
                         'flowid': flow_id,
-                        # 'stats': {
-                        #     'rowcount': 0,
-                        #     'bytes': 0,
-                        # },
                         'modified': update_time,
+                        'created': create_time,
                         'id': dataset_id
                     })
 
