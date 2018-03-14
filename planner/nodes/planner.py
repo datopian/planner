@@ -38,7 +38,6 @@ def planner(datapackage_input, prefix, processing, outputs, allowed_types=None):
 
     # Add types for all resources
     resource_mapping = parameters.get('resource-mapping', {})
-    tabular_info = []
     for descriptor in resource_info:
         path = descriptor['path']
         name = descriptor['name']
@@ -73,21 +72,14 @@ def planner(datapackage_input, prefix, processing, outputs, allowed_types=None):
                 del descriptor['schema']
                 descriptor['geojsonSchema'] = schema
 
-        if 'schema' in descriptor:
-            tabular_descriptor = deepcopy(descriptor)
-
-            tabular_descriptor['datahub'] = {
-                'type': 'source/tabular'
-            }
-            tabular_info.append(tabular_descriptor)
-
+        descriptor['path'] = os.path.join('archive', '{}.{}'.format(name, extension))
         descriptor['datahub'] = {
             'type': 'original'
         }
-        descriptor['path'] = os.path.join('archive', '{}.{}'.format(name, extension))
-        descriptor['name'] += '_original'
-
-    resource_info.extend(tabular_info)
+        if 'schema' in descriptor:
+            descriptor['datahub'] = {
+                'type': 'source/tabular'
+            }
 
     # Processing on resources
     processed_resources = set(p['input'] for p in processing)
@@ -103,6 +95,8 @@ def planner(datapackage_input, prefix, processing, outputs, allowed_types=None):
 
         for p in processing:
             if p['input'] == ri['name']:
+                # keep original resource without processing steps for zip
+                ri['name'] += '_original'
                 ri_ = deepcopy(ri)
                 if 'tabulator' in p:
                     ri_.update(p['tabulator'])
