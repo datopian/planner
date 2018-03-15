@@ -38,6 +38,7 @@ def planner(datapackage_input, prefix, processing, outputs, allowed_types=None):
 
     # Add types for all resources
     resource_mapping = parameters.get('resource-mapping', {})
+    original_info = []
     for descriptor in resource_info:
         path = descriptor['path']
         name = descriptor['name']
@@ -77,9 +78,14 @@ def planner(datapackage_input, prefix, processing, outputs, allowed_types=None):
             'type': 'original'
         }
         if 'schema' in descriptor:
+            # keep original resource without processing steps for zip
+            original_descriptor = deepcopy(descriptor)
+            original_descriptor['name'] += '_original'
+            original_info.append(original_descriptor)
             descriptor['datahub'] = {
                 'type': 'source/tabular'
             }
+    resource_info.extend(original_info)
 
     # Processing on resources
     processed_resources = set(p['input'] for p in processing)
@@ -95,7 +101,7 @@ def planner(datapackage_input, prefix, processing, outputs, allowed_types=None):
 
         for p in processing:
             if p['input'] == ri['name']:
-                # keep original resource without processing steps for zip
+                # Make sure we have original resource if no schema provided
                 ri['name'] += '_original'
                 ri_ = deepcopy(ri)
                 if 'tabulator' in p:
