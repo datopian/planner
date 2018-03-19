@@ -101,8 +101,6 @@ def planner(datapackage_input, prefix, processing, outputs, allowed_types=None):
 
         for p in processing:
             if p['input'] == ri['name']:
-                # Make sure we have original resource if no schema provided
-                ri['name'] += '_original'
                 ri_ = deepcopy(ri)
                 if 'tabulator' in p:
                     ri_.update(p['tabulator'])
@@ -116,6 +114,10 @@ def planner(datapackage_input, prefix, processing, outputs, allowed_types=None):
                 ri_['name'] = p['output']
                 ri_['datahub']['type'] = 'source/tabular'
                 updated_resource_info.append(ri_)
+
+        # Make sure we keep original resource if no schema provided
+        if ri['datahub']['type'] == 'original':
+            ri['name'] += '_original'
 
     resource_info = dict(
         (ri['name'], ri)
