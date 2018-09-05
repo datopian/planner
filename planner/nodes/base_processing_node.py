@@ -31,4 +31,4 @@ class BaseProcessingNode():
         self.outputs = outputs
 
     def get_artifacts(self):
-        raise NotImplemented()
+        raise NotImplemented() # noqa
