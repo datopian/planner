@@ -33,3 +33,11 @@ before_deploy:
   - pandoc --version
   - pandoc -f markdown_github -t rst -o README.rst README.md
   - mv README.rst README.md
+  - curl -s https://raw.githubusercontent.com/datahq/deploy/master/apps_travis_script.sh > .travis.sh
+
+deploy:
+  skip_cleanup: true
+  provider: script
+  script: bash .travis.sh trigger specstore
+  on:
+    branch: master
